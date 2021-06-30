@@ -15,9 +15,18 @@ mvn archetype:generate \
       -DinteractiveMode=false
 ```
 
-# Run With
+# Run Word Count With
+Word count is directly from the example found [here](https://beam.apache.org/get-started/quickstart-java/)
 
 ```bash
 mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.WordCount \
      -Dexec.args="--inputFile=sample.txt --output=counts" -Pdirect-runner
+```
+
+# Run Hello World With
+This is a simple pipeline that prints hello world to a file
+
+```bash
+mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.HelloWorld \
+     -Dexec.args="" -Pdirect-runner
 ```
