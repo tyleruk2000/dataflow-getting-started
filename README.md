@@ -1,6 +1,7 @@
 # Dataflow Getting Started
 
-Created using the following command from this [guide](https://beam.apache.org/get-started/quickstart-java/)
+* Created using the following command from this [guide](https://beam.apache.org/get-started/quickstart-java/)
+* sample.txt created from [https://www.lipsum.com/](https://www.lipsum.com/)
 
 ```bash
 mvn archetype:generate \
