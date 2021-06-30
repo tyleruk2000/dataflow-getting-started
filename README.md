@@ -13,3 +13,10 @@ mvn archetype:generate \
       -Dpackage=org.apache.beam.examples \
       -DinteractiveMode=false
 ```
+
+# Run With
+
+```bash
+mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.WordCount \
+     -Dexec.args="--inputFile=sample.txt --output=counts" -Pdirect-runner
+```
