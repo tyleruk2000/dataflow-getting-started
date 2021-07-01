@@ -42,3 +42,12 @@ mvn -Pdataflow-runner compile exec:java \
     -Dexec.args="--project=$PROJECT_ID \
     --runner=DataflowRunner"
 ```
+
+# Branch Test
+A sample workflow using several branches
+
+**local**
+```bash
+mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.BranchTest \
+     -Dexec.args="" -Pdirect-runner
+```
