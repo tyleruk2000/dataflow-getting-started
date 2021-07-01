@@ -23,10 +23,22 @@ mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.WordCount \
      -Dexec.args="--inputFile=sample.txt --output=counts" -Pdirect-runner
 ```
 
-# Run Hello World With
-This is a simple pipeline that prints hello world to a file
+# Hello World
+This is a simple pipeline that generates a random number multiple times to generate load to test Dataflow autoscaling:
+![Autoscale](./docs/autoscale.png)
 
+
+**local**
 ```bash
 mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.HelloWorld \
      -Dexec.args="" -Pdirect-runner
+```
+
+**gcp**
+```bash
+export PROJECT_ID=$(gcloud config get-value project)
+mvn -Pdataflow-runner compile exec:java \
+    -Dexec.mainClass=org.apache.beam.examples.HelloWorld \
+    -Dexec.args="--project=$PROJECT_ID \
+    --runner=DataflowRunner"
 ```
