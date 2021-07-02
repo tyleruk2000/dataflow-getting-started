@@ -58,5 +58,6 @@ export PROJECT_ID=$(gcloud config get-value project)
 mvn -Pdataflow-runner compile exec:java \
     -Dexec.mainClass=org.apache.beam.examples.BranchTest \
     -Dexec.args="--project=$PROJECT_ID \
-    --runner=DataflowRunner"
+    --runner=DataflowRunner\
+    --region=europe-west2"
 ```
