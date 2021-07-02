@@ -81,6 +81,8 @@ public class BranchTest {
         moonId.apply(ToString.elements()).apply("WriteMoon", TextIO.write().to("Moon"));
         asteroidId.apply(ToString.elements()).apply("WriteAsteroid", TextIO.write().to("Asteroid"));
 
+        
+
         p.run().waitUntilFinish();
     }
 }

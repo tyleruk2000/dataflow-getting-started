@@ -51,3 +51,11 @@ A sample workflow using several branches
 mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.BranchTest \
      -Dexec.args="" -Pdirect-runner
 ```
+
+```bash
+export PROJECT_ID=$(gcloud config get-value project)
+mvn -Pdataflow-runner compile exec:java \
+    -Dexec.mainClass=org.apache.beam.examples.BranchTest \
+    -Dexec.args="--project=$PROJECT_ID \
+    --runner=DataflowRunner"
+```
