@@ -45,6 +45,7 @@ mvn -Pdataflow-runner compile exec:java \
 
 # Branch Test
 A sample workflow using several branches
+![Autoscale](./docs/branch.png)
 
 **local**
 ```bash

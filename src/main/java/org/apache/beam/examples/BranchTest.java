@@ -6,6 +6,7 @@ import java.util.SplittableRandom;
 
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
+import org.apache.beam.sdk.io.mongodb.MongoDbIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Create;
@@ -13,42 +14,51 @@ import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.ToString;
 import org.apache.beam.sdk.values.PCollection;
+import org.bson.Document;
 
 public class BranchTest {
 
-    static class CreateSystem extends DoFn<Long, Long> {
+    static class CreateSystem extends DoFn<Long, Document> {
         @ProcessElement
         public void processElement(ProcessContext c){
-            c.output(new Random().nextLong());
+            Document a = new Document();
+            a.append("name", new Random().nextLong());
+            c.output(a);
         }
     }
 
-    static class CreateStar extends DoFn<Long, Long> {
+    static class CreateStar extends DoFn<Document, Document> {
         @ProcessElement
         public void processElement(ProcessContext c){
             int totalStar = new SplittableRandom().nextInt(1, 3);
             for (int i = 0; i < totalStar; i++) {
-                c.output(new Random().nextLong());
+                Document a = new Document();
+                a.append("name", new Random().nextLong());
+                c.output(a);
             }
         }
     }
 
-    static class CreatePlanet extends DoFn<Long, Long> {
+    static class CreatePlanet extends DoFn<Document, Document> {
         @ProcessElement
         public void processElement(ProcessContext c){
             int totalStar = new SplittableRandom().nextInt(3, 15);
             for (int i = 0; i < totalStar; i++) {
-                c.output(new Random().nextLong());
+                Document a = new Document();
+                a.append("name", new Random().nextLong());
+                c.output(a);
             }
         }
     }
 
-    static class CreateAsteroid extends DoFn<Long, Long> {
+    static class CreateAsteroid extends DoFn<Document, Document> {
         @ProcessElement
         public void processElement(ProcessContext c){
             int totalStar = new SplittableRandom().nextInt(100, 1000000);
             for (int i = 0; i < totalStar; i++) {
-                c.output(new Random().nextLong());
+                Document a = new Document();
+                a.append("name", new Random().nextLong());
+                c.output(a);
             }
         }
     }
@@ -61,27 +71,53 @@ public class BranchTest {
         BranchTestOptions options = PipelineOptionsFactory.fromArgs(args).withValidation().as(BranchTestOptions.class);
 
         ArrayList<Long> seedList = new ArrayList<Long>();
-        seedList.add(0l);
-
+        for (long i = 0; i < 100; i++) {
+            seedList.add(i);
+        }
+        
         Pipeline p = Pipeline.create(options);
         PCollection<Long> seeds =  p.apply(Create.of(seedList));
         
-        PCollection<Long> systemIds =  seeds.apply("Create System", ParDo.of(new CreateSystem()));
+        PCollection<Document> systemIds =  seeds.apply("Create System", ParDo.of(new CreateSystem()));
 
-        PCollection<Long> startIds =  systemIds.apply("Create Star", ParDo.of(new CreateStar()));
+        PCollection<Document> starIds =  systemIds.apply("Create Star", ParDo.of(new CreateStar()));
 
-        PCollection<Long> planetId =  startIds.apply("Create Planet", ParDo.of(new CreatePlanet()));
-        PCollection<Long> moonId =  planetId.apply("Create Moon", ParDo.of(new CreatePlanet()));
+        PCollection<Document> planetId =  starIds.apply("Create Planet", ParDo.of(new CreatePlanet()));
+        PCollection<Document> moonId =  planetId.apply("Create Moon", ParDo.of(new CreatePlanet()));
 
-        PCollection<Long> asteroidId =  startIds.apply("Create Asteroid", ParDo.of(new CreateAsteroid()));
+        PCollection<Document> asteroidId =  starIds.apply("Create Asteroid", ParDo.of(new CreateAsteroid()));
 
-        systemIds.apply(ToString.elements()).apply("WriteSystem", TextIO.write().to("System"));
-        startIds.apply(ToString.elements()).apply("WriteStar", TextIO.write().to("Star"));
-        planetId.apply(ToString.elements()).apply("WritePlanet", TextIO.write().to("Planet"));
-        moonId.apply(ToString.elements()).apply("WriteMoon", TextIO.write().to("Moon"));
-        asteroidId.apply(ToString.elements()).apply("WriteAsteroid", TextIO.write().to("Asteroid"));
+        String mongoURI = "mongodb://localhost:27017";
 
-        
+        systemIds.apply("Write System", MongoDbIO.write()
+            .withUri(mongoURI)
+            .withDatabase("my-database")
+            .withCollection("my-collection")
+        );
+
+        starIds.apply("Write Star", MongoDbIO.write()
+            .withUri(mongoURI)
+            .withDatabase("my-database")
+            .withCollection("stars")
+        );
+
+        planetId.apply("Write Planet", MongoDbIO.write()
+            .withUri(mongoURI)
+            .withDatabase("my-database")
+            .withCollection("planets")
+        );
+
+        moonId.apply("Write Moon", MongoDbIO.write()
+            .withUri(mongoURI)
+            .withDatabase("my-database")
+            .withCollection("moons")
+        );
+
+        asteroidId.apply("Write AsteroidId", MongoDbIO.write()
+            .withUri(mongoURI)
+            .withDatabase("my-database")
+            .withCollection("asteroids")
+        );  
 
         p.run().waitUntilFinish();
     }
